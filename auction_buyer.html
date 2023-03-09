@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+
+  <link rel="stylesheet" type="text/css" href="test2.css">
+
+  <script src="./node_modules/web3/dist/web3.min.js"></script>
+
+</head>
+
+<body>
+    <div class="container">
+    
+        <h1>交易系统-Buyer</h1>
+
+        <h2>Auction</h2>
+
+        <!-- <label for="Buyer Address" class="col-lg-2 control-label">BuyerAddress</label>
+        <input id="Buyer Address" type="text">
+        
+        <label for="Seller Address" class="col-lg-2 control-label">SellerAddress</label>
+        <input id="Seller Address" type="text"> -->
+        <label for="_Contract" class="col-lg-2 control-label">Contract Address</label>
+        <input id="_contract" type="text">
+        <button id="set_contrast">Set Contrast</button>
+        <br>
+        <br>
+        <label for="_Value" class="col-lg-2 control-label">Amount to bid</label>
+        <input id="_value" type="text">
+        
+        <!-- <label for="_Name" class="col-lg-2 control-label">Name</label>
+        <input id="_name" type="text"> -->
+        
+
+        <!-- <label for="CommitTime" class="col-lg-2 control-label">CommitTime</label>
+        <input id="CommitTime" type="text"> -->
+
+        <button id="bid">Bid</button>
+        <h4 id="amount"></h4>
+        <!-- &nbsp; -->
+        <h2>Query</h2>
+
+        <button id="get_highAmount">Highest Amount</button>
+        <h4 id="Highest"></h2>
+    
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+    <script>
+        if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider);
+            } else {
+            // set the provider you want from Web3.providers
+                web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));//这里填写你的ganache-cli/ganache监听地址
+                web3.eth.getAccounts(function (error, result) {
+                console.log("账户列表地址：");
+                console.log(result);
+                });
+            }
+        var contractABI = [
+                            {
+                                "inputs": [
+                                    {
+                                        "internalType": "address payable",
+                                        "name": "_seller",
+                                        "type": "address"
+                                    },
+                                    {
+                                        "internalType": "string",
+                                        "name": "_name",
+                                        "type": "string"
+                                    }
+                                ],
+                                "stateMutability": "nonpayable",
+                                "type": "constructor"
+                            },
+                            {
+                                "anonymous": false,
+                                "inputs": [
+                                    {
+                                        "indexed": false,
+                                        "internalType": "address",
+                                        "name": "_winner",
+                                        "type": "address"
+                                    },
+                                    {
+                                        "indexed": false,
+                                        "internalType": "uint256",
+                                        "name": "_amount",
+                                        "type": "uint256"
+                                    }
+                                ],
+                                "name": "End_Auction",
+                                "type": "event"
+                            },
+                            {
+                                "anonymous": false,
+                                "inputs": [
+                                    {
+                                        "indexed": false,
+                                        "internalType": "address",
+                                        "name": "_bidder",
+                                        "type": "address"
+                                    },
+                                    {
+                                        "indexed": false,
+                                        "internalType": "uint256",
+                                        "name": "_amount",
+                                        "type": "uint256"
+                                    }
+                                ],
+                                "name": "HighestBidIncreased",
+                                "type": "event"
+                            },
+                            {
+                                "inputs": [],
+                                "name": "admin",
+                                "outputs": [
+                                    {
+                                        "internalType": "address",
+                                        "name": "",
+                                        "type": "address"
+                                    }
+                                ],
+                                "stateMutability": "view",
+                                "type": "function"
+                            },
+                            {
+                                "inputs": [
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "amount",
+                                        "type": "uint256"
+                                    }
+                                ],
+                                "name": "aution",
+                                "outputs": [],
+                                "stateMutability": "payable",
+                                "type": "function"
+                            },
+                            {
+                                "inputs": [],
+                                "name": "buyer",
+                                "outputs": [
+                                    {
+                                        "internalType": "address payable",
+                                        "name": "",
+                                        "type": "address"
+                                    }
+                                ],
+                                "stateMutability": "view",
+                                "type": "function"
+                            },
+                            {
+                                "inputs": [],
+                                "name": "endAuction",
+                                "outputs": [],
+                                "stateMutability": "payable",
+                                "type": "function"
+                            },
+                            {
+                                "inputs": [],
+                                "name": "getContractAddress",
+                                "outputs": [
+                                    {
+                                        "internalType": "address",
+                                        "name": "",
+                                        "type": "address"
+                                    }
+                                ],
+                                "stateMutability": "view",
+                                "type": "function"
+                            },
+                            {
+                                "inputs": [],
+                                "name": "getHighAmount",
+                                "outputs": [
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "",
+                                        "type": "uint256"
+                                    }
+                                ],
+                                "stateMutability": "view",
+                                "type": "function"
+                            },
+                            {
+                                "inputs": [],
+                                "name": "highAmount",
+                                "outputs": [
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "",
+                                        "type": "uint256"
+                                    }
+                                ],
+                                "stateMutability": "view",
+                                "type": "function"
+                            },
+                            {
+                                "inputs": [],
+                                "name": "seller",
+                                "outputs": [
+                                    {
+                                        "internalType": "address payable",
+                                        "name": "",
+                                        "type": "address"
+                                    }
+                                ],
+                                "stateMutability": "view",
+                                "type": "function"
+                            },
+                            {
+                                "inputs": [],
+                                "name": "withdraw",
+                                "outputs": [
+                                    {
+                                        "internalType": "bool",
+                                        "name": "",
+                                        "type": "bool"
+                                    }
+                                ],
+                                "stateMutability": "nonpayable",
+                                "type": "function"
+                            }
+                        ];
+
+        var buyer = '0xFB4438A5De065f15A5d5aAc18895169fa5E7BbB9' ;
+        $("#bid").click(function () {
+            demoContract.methods.aution($("#_value").val())
+                .send({from:buyer,value:$("#_value").val()})
+                .then($("#amount").html('Aution for' + $("#_value").val() + 'WEI'))
+        })
+
+        $("#set_contrast").click(function () {
+            demoContract = new web3.eth.Contract(contractABI,$("#_contract").val());
+            console.log('Contract set! Address' + $("#_contract").val());
+        })
+
+        $("#get_highAmount").click(function (e,result) {
+            demoContract.methods.getHighAmount()
+                // .send({from:admin})
+                .call((err,result) => {
+                    if(!err){
+                        $("#Highest").html('Highest Amount : ' + result);
+                    } else {
+                        console.log(err);
+                    }
+                })
+        })
+    </script>
+
+</body>
+
+</html>
